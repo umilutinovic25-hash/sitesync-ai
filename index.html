@@ -9,7 +9,9 @@
 <meta property="og:url" content="https://umilutinovic25-hash.github.io/sitesync-ai/">
 <meta property="og:title" content="SiteSync AI — Kašnjenje vidite pre nego što nastane">
 <meta property="og:description" content="Enterprise AI platforma za građevinske i EPC kompanije.">
-<meta property="og:image" content="https://umilutinovic25-hash.github.io/sitesync-ai/assets/hero.webp">
+<meta property="og:image" content="https://umilutinovic25-hash.github.io/sitesync-ai/assets/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="675">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230B1220'/%3E%3Cpath d='M8 22 L16 8 L24 22 Z' fill='none' stroke='%23F5A524' stroke-width='2.5' stroke-linejoin='round'/%3E%3Ccircle cx='16' cy='18' r='2.2' fill='%23F5A524'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -123,7 +125,7 @@
   .capabilities svg { color: var(--amber); flex: none; }
 
   /* Data layer on top of the photo */
-  .overlay { position: relative; height: 100%; min-height: 460px; }
+  .overlay { position: relative; align-self: stretch; min-height: 460px; }
   .overlay-photo { display: none; }
   .marker { position: absolute; display: flex; align-items: center; gap: 10px; }
   .marker .dot { position: relative; width: 12px; height: 12px; border-radius: 50%; background: var(--c); box-shadow: 0 0 0 3px rgba(7, 13, 24, .6); flex: none; }
@@ -134,13 +136,17 @@
     backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); white-space: nowrap;
   }
   .marker .tag b { font-weight: 500; color: var(--c); }
-  .m1 { --c: var(--ok); top: 6%; left: 8%; }
-  .m2 { --c: var(--amber); top: 28%; left: 46%; }
-  .m3 { --c: var(--risk); top: 22%; left: 0%; }
+  .m1 { --c: var(--ok); }
+  .m2 { --c: var(--amber); }
+  .m3 { --c: var(--risk); }
+  .hero-markers { position: absolute; inset: 0; z-index: 3; pointer-events: none; }
+  .hero-markers .marker { left: 0; top: 0; margin: -13px 0 0 -6px; visibility: hidden; }
+  .hero-markers .marker .dot { margin-top: 0; }
+  .hero-markers .marker.is-placed { visibility: visible; }
   @keyframes ping { 0% { transform: scale(.6); opacity: .7; } 80%, 100% { transform: scale(1.8); opacity: 0; } }
 
   .panel {
-    position: absolute; right: 0; bottom: 0; width: min(360px, 100%);
+    position: absolute; right: 0; top: 0; width: min(360px, 100%);
     background: rgba(11, 18, 32, .92); border: 1px solid rgba(203, 213, 225, .16); border-radius: var(--radius);
     backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
     padding: 20px 22px; box-shadow: 0 24px 60px rgba(0, 0, 0, .45);
@@ -277,6 +283,7 @@
   .success .check { width: 56px; height: 56px; border-radius: 50%; margin: 0 auto 18px; display: grid; place-items: center; background: #ECFDF5; color: var(--ok-ink); }
   .success h3 { margin: 0 0 8px; }
   .success p { margin: 0; color: var(--ink-soft); }
+  .form-card.sent { display: flex; align-items: center; justify-content: center; }
   .form-card.sent form { display: none; }
   .form-card.sent .success { display: block; animation: rise .4s var(--ease) both; }
 
@@ -298,6 +305,7 @@
     .hero-grid { grid-template-columns: 1fr; }
     .overlay { min-height: 380px; }
     .panel { right: auto; left: 0; }
+    .hero-markers { display: none; }
     .section-head { grid-template-columns: 1fr; }
     .cards { grid-template-columns: 1fr; max-width: 680px; }
     .how-grid { grid-template-columns: 1fr; gap: 48px; }
@@ -317,9 +325,7 @@
     .overlay-photo { display: block; position: relative; border-radius: 12px; overflow: hidden; aspect-ratio: 4 / 3; border: 1px solid rgba(203, 213, 225, .14); }
     .overlay-photo img { width: 100%; height: 100%; object-fit: cover; object-position: 55% 60%; }
     .overlay-photo::after { content: ""; position: absolute; inset: 0; background: linear-gradient(0deg, rgba(7, 13, 24, .75) 0%, rgba(7, 13, 24, 0) 45%); }
-    .marker { display: none; }
-    .overlay-photo .marker { display: flex; z-index: 1; }
-    .overlay-photo .m3 { top: auto; bottom: 52px; left: 12px; }
+    .overlay-photo .marker { z-index: 1; left: 12px; bottom: 52px; }
     .panel { position: relative; width: auto; margin: -40px 12px 0; }
     .cta-row .btn { flex: 1 1 100%; }
     .section { padding: 72px 0 64px; }
@@ -358,12 +364,17 @@
     <div class="hero-media">
       <img src="assets/hero.webp" width="2048" height="1152" alt="" fetchpriority="high">
     </div>
+    <div class="hero-markers" aria-hidden="true">
+      <div class="marker m1" data-x=".56" data-y=".675"><span class="dot"></span><span class="tag">Konstrukcija, 4. sprat · <b class="mono">u planu</b></span></div>
+      <div class="marker m2" data-x=".655" data-y=".83"><span class="dot"></span><span class="tag">Instalacije, zona B · <b class="mono">−4 dana</b></span></div>
+      <div class="marker m3" data-x=".80" data-y=".74"><span class="dot"></span><span class="tag">Fasada, istok · <b class="mono">rizik</b></span></div>
+    </div>
 
     <div class="wrap hero-grid">
       <div>
         <p class="eyebrow reveal">Platforma za građevinske i EPC kompanije</p>
         <h1 id="hero-naslov" class="reveal d1">Kašnjenje vidite pre nego što nastane.</h1>
-        <p class="lede reveal d2">SiteSync AI prati stvarni napredak radova iz foto i dron snimaka, rano upozorava na kašnjenja i prekoračenja budžeta i automatski priprema izveštaje za upravu i investitore. Za projekte vredne milione, na kojima nema mesta iznenađenjima.</p>
+        <p class="lede reveal d2">SiteSync AI iz foto i dron snimaka meri stvarni napredak radova i upozorava na kašnjenja i prekoračenja budžeta dok još ima vremena da se reaguje. Za projekte vredne milione, na kojima nema mesta iznenađenjima.</p>
         <div class="cta-row reveal d3">
           <a class="btn btn-primary" href="#demo">
             Zakažite demo
@@ -371,10 +382,10 @@
           </a>
           <a class="btn btn-ghost" href="#kako">Kako funkcioniše</a>
         </div>
-        <ul class="capabilities reveal d4" aria-label="Mogućnosti platforme">
-          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/><circle cx="12" cy="12" r="3"/></svg>Foto i dron snimci sa terena</li>
-          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg>Predviđanje rokova i troškova</li>
-          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6"/></svg>Izveštaji bez ručnog sastavljanja</li>
+        <ul class="capabilities reveal d4" aria-label="Vrste projekata">
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 20h18M5 20V9l7-5 7 5v11"/><path d="M9 20v-6h6v6"/></svg>Infrastruktura</li>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21V11l5 3V11l5 3V7l8 4v10z"/></svg>Industrijski objekti</li>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg>Energetska postrojenja</li>
         </ul>
       </div>
 
@@ -383,9 +394,6 @@
           <img src="assets/hero.webp" width="2048" height="1152" alt="">
           <div class="marker m3"><span class="dot"></span><span class="tag">Fasada, istok · <b class="mono">rizik</b></span></div>
         </div>
-        <div class="marker m1" aria-hidden="true"><span class="dot"></span><span class="tag">Konstrukcija, sprat 6 · <b class="mono">u planu</b></span></div>
-        <div class="marker m2" aria-hidden="true"><span class="dot"></span><span class="tag">Instalacije, zona B · <b class="mono">−4 dana</b></span></div>
-        <div class="marker m3" aria-hidden="true"><span class="dot"></span><span class="tag">Fasada, istok · <b class="mono">rizik</b></span></div>
 
         <div class="panel reveal d4" aria-hidden="true">
           <div class="panel-head">
@@ -430,7 +438,7 @@
           <p class="kicker">Ključne prednosti</p>
           <h2 id="prednosti-naslov">Odluke donosite na osnovu podataka sa terena, a ne izveštaja od prošlog meseca.</h2>
         </div>
-        <p>Sve što se dešava na gradilištu postaje merljivo i dostupno istog dana: upravi, projektnom timu i investitoru, iz jednog izvora.</p>
+        <p>Umesto nedeljnih obilazaka i tabela koje se sastavljaju ručno, uprava i projektni tim imaju isti, proverljiv uvid u stanje svakog gradilišta.</p>
       </div>
 
       <div class="cards">
@@ -513,11 +521,11 @@
       <div>
         <p class="eyebrow">Demo</p>
         <h2 id="demo-naslov">Pogledajte SiteSync AI na primeru projekta poput vašeg.</h2>
-        <p class="intro">Ostavite podatke i dogovorićemo termin za prezentaciju platforme prilagođenu vrsti i veličini vaših projekata.</p>
+        <p class="intro">Ostavite podatke i dogovorićemo termin. Demo pripremamo za vrstu i veličinu vaših projekata, ne kao opštu prezentaciju.</p>
         <ul class="agenda">
-          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg>Praćenje napretka na stvarnim dron snimcima</li>
-          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg>Kako izgleda upozorenje na kašnjenje i prekoračenje budžeta</li>
-          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg>Primer izveštaja za upravu i investitore</li>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg>Prikaz platforme na projektu slične vrste i veličine</li>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg>Pregled kako vaš tim danas prati napredak i sastavlja izveštaje</li>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg>Predlog pilot projekta na jednom vašem gradilištu</li>
         </ul>
       </div>
 
@@ -578,6 +586,41 @@
 
 <script>
   (function () {
+    var hero = document.querySelector('.hero');
+    var img = document.querySelector('.hero-media img');
+    var layer = document.querySelector('.hero-markers');
+    var blockers = [document.querySelector('.hero-grid > div'), document.querySelector('.overlay .panel')];
+
+    function overlaps(a, b) {
+      return !(a.right < b.left || a.left > b.right || a.bottom < b.top || a.top > b.bottom);
+    }
+
+    function placeMarkers() {
+      if (getComputedStyle(layer).display === 'none') return;
+      var W = hero.clientWidth, H = hero.clientHeight;
+      var scale = Math.max(W / img.naturalWidth, H / img.naturalHeight);
+      var iw = img.naturalWidth * scale, ih = img.naturalHeight * scale;
+      var ox = (W - iw) * 0.6, oy = (H - ih) * 0.7; /* matches object-position: 60% 70% */
+      var heroRect = hero.getBoundingClientRect();
+      Array.prototype.forEach.call(layer.querySelectorAll('.marker'), function (m) {
+        m.style.transform = 'translate(' + (ox + parseFloat(m.dataset.x) * iw) + 'px,' + (oy + parseFloat(m.dataset.y) * ih) + 'px)';
+        var r = m.getBoundingClientRect();
+        var clear = r.right < heroRect.right - 8 && r.bottom < heroRect.bottom - 8 && blockers.every(function (b) {
+          if (!b) return true;
+          var br = b.getBoundingClientRect();
+          return !overlaps(r, { left: br.left - 12, right: br.right + 12, top: br.top - 12, bottom: br.bottom + 12 });
+        });
+        m.classList.toggle('is-placed', clear);
+      });
+    }
+
+    if (img.complete && img.naturalWidth) placeMarkers(); else img.addEventListener('load', placeMarkers);
+    window.addEventListener('resize', placeMarkers);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(placeMarkers);
+    setTimeout(placeMarkers, 900); /* after entrance animation settles */
+  })();
+
+  (function () {
     var form = document.getElementById('demo-forma');
     var card = document.getElementById('demo-kartica');
     var emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
@@ -603,6 +646,7 @@
       if (firstInvalid) { firstInvalid.focus(); return; }
       var ime = document.getElementById('ime').value.trim().split(/\s+/)[0];
       document.getElementById('uspeh-tekst').textContent = 'Hvala, ' + ime + '. Javićemo vam se u roku od jednog radnog dana da dogovorimo termin.';
+      card.style.minHeight = card.offsetHeight + 'px';
       card.classList.add('sent');
     });
   })();
