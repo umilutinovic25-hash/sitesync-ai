@@ -26,6 +26,8 @@
     Dials: variance 5, motion 4, density 4. One dark theme for the whole page.
     Shape system: containers 14px, controls and chips 8px, data annotations 4px.
     Icons: Phosphor (regular), inlined as an SVG sprite.
+    Surfaces: double-bezel trays on the product panel, drone survey and form; fixed film grain.
+    Motion: hero analysis intro (scan, staggered markers, count-up), scroll reveals, forecast build. All off under reduced motion.
   */
   :root {
     --bg: #070D18;
@@ -47,6 +49,7 @@
     --r-md: 8px;
     --r-sm: 4px;
     --shadow: 0 24px 60px rgba(2, 6, 16, .55);
+    --bezel: 0 0 0 6px rgba(203, 213, 225, .035), 0 0 0 7px rgba(203, 213, 225, .1);
     --ease: cubic-bezier(.16, 1, .3, 1);
   }
   *, *::before, *::after { box-sizing: border-box; }
@@ -60,6 +63,11 @@
     background: var(--bg);
     -webkit-font-smoothing: antialiased;
   }
+  body::after {
+    content: ""; position: fixed; inset: 0; z-index: 90; pointer-events: none; opacity: .045;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .9 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  main { overflow-x: clip; }
   img { max-width: 100%; display: block; }
   a { color: inherit; }
   h1, h2, h3 { text-wrap: balance; }
@@ -83,8 +91,9 @@
   .btn:active { transform: scale(.98); }
   .btn-primary { background: var(--accent); color: var(--on-accent); }
   .btn-primary:hover { background: var(--accent-hover); }
-  .btn-primary .ic { font-size: 18px; transition: transform .2s var(--ease); }
-  .btn-primary:hover .ic { transform: translateX(3px); }
+  .btn-ic { display: grid; place-items: center; width: 30px; height: 30px; margin-right: -12px; border-radius: 6px; background: rgba(11, 18, 32, .12); transition: transform .35s var(--ease), background-color .2s var(--ease); }
+  .btn-ic .ic { font-size: 17px; }
+  .btn-primary:hover .btn-ic { transform: translateX(3px); background: rgba(11, 18, 32, .18); }
   .btn-sm { min-height: 44px; padding: 0 18px; font-size: 15px; }
   .text-link {
     display: inline-flex; align-items: center; gap: 8px; min-height: 48px; padding: 0 6px;
@@ -110,7 +119,12 @@
     padding: 120px 0 80px;
   }
   .hero-media { position: absolute; inset: 0; }
-  .hero-media img { width: 100%; height: 100%; object-fit: cover; object-position: 60% 70%; }
+  .hero-media img { width: 100%; height: 100%; object-fit: cover; object-position: 60% 70%; transform-origin: 60% 70%; }
+  .hero.is-intro .hero-media img { animation: settle 2.4s var(--ease) both; }
+  @keyframes settle { from { transform: scale(1.045); } }
+  .hero-scan { position: absolute; inset: 0; z-index: 1; pointer-events: none; opacity: 0; background: linear-gradient(90deg, transparent 44%, rgba(232, 163, 61, .16) 49.4%, rgba(232, 163, 61, .75) 50%, transparent 50.5%); }
+  .hero.is-intro .hero-scan { animation: hscan 1.7s cubic-bezier(.45, .05, .35, 1) .35s both; }
+  @keyframes hscan { 0% { transform: translateX(-50%); opacity: 1; } 85% { opacity: 1; } 100% { transform: translateX(50%); opacity: 0; } }
   .hero-media::after {
     content: ""; position: absolute; inset: 0;
     background:
@@ -130,6 +144,8 @@
   .marker { position: absolute; left: 0; top: 0; display: flex; align-items: center; gap: 10px; }
   .hero-markers .marker { margin: -13px 0 0 -6px; visibility: hidden; }
   .hero-markers .marker.is-placed { visibility: visible; }
+  .hero.is-intro .marker .dot, .hero.is-intro .marker .tag { animation: pop .5s var(--ease) both; animation-delay: var(--md, 1.4s); }
+  @keyframes pop { from { opacity: 0; transform: scale(.85); } }
   .marker .dot { position: relative; width: 12px; height: 12px; border-radius: 50%; background: var(--c); box-shadow: 0 0 0 3px rgba(7, 13, 24, .65); flex: none; }
   .marker.is-risk .dot::after { content: ""; position: absolute; inset: -6px; border-radius: 50%; border: 1.5px solid var(--c); animation: ping 2.4s var(--ease) infinite; }
   .marker .tag { font-size: 12px; line-height: 1.3; padding: 6px 10px; border-radius: var(--r-sm); background: rgba(7, 13, 24, .86); border: 1px solid var(--line); white-space: nowrap; color: var(--text); }
@@ -144,7 +160,7 @@
     position: absolute; right: 0; top: 0; width: min(400px, 100%);
     background: rgba(11, 18, 32, .93); border: 1px solid var(--line-strong); border-radius: var(--r-lg);
     backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-    box-shadow: var(--shadow), inset 0 1px 0 rgba(255, 255, 255, .06);
+    box-shadow: var(--bezel), var(--shadow), inset 0 1px 0 rgba(255, 255, 255, .07);
     padding: 22px 24px 20px;
   }
   .panel-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 18px; }
@@ -156,9 +172,10 @@
   .kpi-label { font-size: 14px; line-height: 1.35; color: var(--text-2); padding-bottom: 4px; }
   .kpi-label .mono { color: var(--text-3); }
   .bar { position: relative; height: 8px; margin-top: 14px; border-radius: var(--r-sm); background: rgba(203, 213, 225, .12); }
-  .bar i { position: absolute; inset: 0 auto 0 0; width: var(--w); border-radius: var(--r-sm); background: var(--ok); transform-origin: left; animation: grow 1.1s var(--ease) .35s both; }
+  .bar i { position: absolute; inset: 0 auto 0 0; width: var(--w); border-radius: var(--r-sm); background: var(--ok); transform-origin: left; animation: grow 1.3s var(--ease) .7s both; }
   .bar .plan { position: absolute; top: -5px; bottom: -5px; left: var(--p); width: 2px; background: var(--text); }
   @keyframes grow { from { transform: scaleX(0); } }
+  .hero.is-intro .risk { animation: rise .6s var(--ease) 1.9s both; }
   .risk { margin-top: 20px; padding: 16px 18px; border-radius: var(--r-md); background: rgba(232, 163, 61, .1); border: 1px solid rgba(232, 163, 61, .4); }
   .risk-label { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500; color: var(--accent); }
   .risk-label .ic { font-size: 17px; }
@@ -199,13 +216,19 @@
   .timeline .tick.late { background: var(--accent); }
   .timeline .span { position: absolute; top: 17px; height: 5px; border-radius: var(--r-sm); background: rgba(232, 163, 61, .45); }
   .fc-note { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--text-3); }
+  .forecast.is-armed .timeline .span { transform: scaleX(0); transform-origin: left; transition: transform .9s var(--ease) .3s; }
+  .forecast.is-armed .timeline .tick.late, .forecast.is-armed .fc-rows .late, .forecast.is-armed .chip { opacity: 0; transition: opacity .5s var(--ease) 1.1s; }
+  .forecast.is-armed .chip { transform: translateY(6px); transition: opacity .5s var(--ease) 1.25s, transform .5s var(--ease) 1.25s; }
+  .forecast.is-armed.in-view .timeline .span { transform: none; }
+  .forecast.is-armed.in-view .timeline .tick.late, .forecast.is-armed.in-view .fc-rows .late, .forecast.is-armed.in-view .chip { opacity: 1; transform: none; }
   .chip { display: inline-flex; align-items: center; flex: none; white-space: nowrap; padding: 4px 8px; border-radius: var(--r-sm); background: rgba(232, 163, 61, .14); color: var(--accent); font: 500 13px/1 "IBM Plex Mono", monospace; }
 
   .tile-progress { min-height: 280px; display: flex; flex-direction: column; justify-content: flex-end; background: var(--surface-1); }
   .tile-progress > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 62% 45%; }
   .tile-progress::after { content: ""; position: absolute; inset: 0; background: linear-gradient(0deg, rgba(7, 13, 24, .96) 12%, rgba(7, 13, 24, .55) 60%, rgba(7, 13, 24, .2) 100%); }
   .tile-progress > * { position: relative; z-index: 1; }
-  .tile-progress > img { z-index: 0; }
+  .tile-progress > img { z-index: 0; transition: transform 1s var(--ease); }
+  .tile-progress:hover > img { transform: scale(1.04); }
 
   .team { margin-top: 32px; padding-top: 28px; border-top: 1px solid var(--line); display: flex; gap: 16px; align-items: flex-start; }
   .team .ic { font-size: 28px; color: var(--text-3); margin-top: 1px; }
@@ -229,7 +252,7 @@
   .segmented button[aria-pressed="true"] { background: var(--text); color: var(--bg); }
   .segmented .ic { font-size: 18px; }
   .survey-stamp { font-size: 13px; color: var(--text-3); }
-  .survey-media { position: relative; border-radius: var(--r-lg); overflow: hidden; background: var(--bg); border: 1px solid var(--line); box-shadow: var(--shadow); }
+  .survey-media { position: relative; border-radius: var(--r-lg); overflow: hidden; background: var(--bg); border: 1px solid var(--line); box-shadow: var(--bezel), var(--shadow); }
   .survey-media img { width: 100%; height: auto; aspect-ratio: 3 / 2; object-fit: cover; transition: filter .5s var(--ease); }
   .survey.is-analyzed .survey-media img { filter: saturate(.7) brightness(.8); }
   .scan { position: absolute; inset: 0; pointer-events: none; opacity: 0; background: linear-gradient(180deg, transparent 46%, rgba(232, 163, 61, .5) 50%, transparent 51%); transform: translateY(-50%); }
@@ -265,12 +288,16 @@
   .steps p { margin: 0; font-size: 15px; color: var(--text-2); }
 
   /* ---------- Demo ---------- */
-  .demo .wrap { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 470px); gap: 64px; align-items: center; }
+  .demo { position: relative; overflow: hidden; }
+  .demo-media { position: absolute; inset: 0; }
+  .demo-media img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 20%; }
+  .demo-media::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(7, 13, 24, .94) 0%, rgba(7, 13, 24, .78) 45%, rgba(7, 13, 24, .5) 100%), linear-gradient(180deg, var(--bg) 0%, rgba(7, 13, 24, 0) 28%), linear-gradient(0deg, var(--bg) 0%, rgba(7, 13, 24, 0) 30%); }
+  .demo .wrap { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 470px); gap: 64px; align-items: center; }
   .demo-list { list-style: none; margin: 28px 0 0; padding: 0; display: grid; gap: 12px; color: var(--text-2); }
   .demo-list li { display: flex; gap: 12px; align-items: flex-start; }
   .demo-list .ic { font-size: 20px; color: var(--accent); margin-top: 3px; }
 
-  .form-card { border-radius: var(--r-lg); background: var(--surface-2); border: 1px solid var(--line-strong); padding: 32px; box-shadow: var(--shadow); }
+  .form-card { position: relative; border-radius: var(--r-lg); background: var(--surface-2); border: 1px solid var(--line-strong); padding: 32px; box-shadow: var(--bezel), var(--shadow), inset 0 1px 0 rgba(255, 255, 255, .06); }
   .form-card h3 { margin: 0 0 4px; font-size: 20px; font-weight: 600; }
   .form-card .sub { margin: 0 0 24px; color: var(--text-3); font-size: 14px; }
   .field { margin-bottom: 16px; }
@@ -302,6 +329,14 @@
 
   footer { border-top: 1px solid var(--line); color: var(--text-3); font-size: 13px; }
   footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 24px; padding-top: 22px; padding-bottom: 22px; }
+
+  /* ---------- Scroll reveals (armed by JS only) ---------- */
+  .reveals-armed [data-reveal] { opacity: 0; transform: translateY(24px); filter: blur(4px); transition: opacity .8s var(--ease), transform .8s var(--ease), filter .8s var(--ease); transition-delay: var(--rd, 0s); }
+  .reveals-armed [data-reveal].in-view { opacity: 1; transform: none; filter: none; }
+  .bento > :nth-child(2) { --rd: .1s; } .bento > :nth-child(3) { --rd: .2s; }
+  .steps > :nth-child(2) { --rd: .1s; } .steps > :nth-child(3) { --rd: .2s; }
+  .reveals-armed .survey .survey-media img { transform: scale(1.04); transition: transform 1s var(--ease), filter .5s var(--ease); }
+  .reveals-armed .survey.in-view .survey-media img { transform: none; }
 
   /* ---------- Entrance ---------- */
   .reveal { animation: rise .7s var(--ease) both; }
@@ -401,6 +436,7 @@
   <section class="hero" aria-labelledby="hero-naslov">
     <div class="hero-media">
       <img src="assets/hero.webp" width="2048" height="1152" alt="" fetchpriority="high">
+      <span class="hero-scan" aria-hidden="true"></span>
     </div>
     <div class="hero-markers" aria-hidden="true">
       <div class="marker c-ok" data-x=".42" data-y=".80"><span class="dot"></span><span class="tag">Konstrukcija, 2. sprat: <b class="mono">u planu</b></span></div>
@@ -414,7 +450,7 @@
         <h1 id="hero-naslov" class="reveal d1">Kašnjenje vidite pre nego što nastane.</h1>
         <p class="lede reveal d2">SiteSync AI meri napredak radova iz foto i dron snimaka i upozorava na kašnjenja i prekoračenja budžeta na vreme.</p>
         <div class="cta-row reveal d3">
-          <a class="btn btn-primary" href="#demo">Zakažite demo <svg class="ic" aria-hidden="true"><use href="#i-arrow-right"/></svg></a>
+          <a class="btn btn-primary" href="#demo">Zakažite demo <span class="btn-ic" aria-hidden="true"><svg class="ic"><use href="#i-arrow-right"/></svg></span></a>
           <a class="text-link" href="#kako">Kako funkcioniše</a>
         </div>
       </div>
@@ -422,6 +458,7 @@
       <div class="overlay reveal d4" role="img" aria-label="Primer projekta: izvedeno 64 posto radova, plan 68 posto. Rizik kašnjenja 11 dana zbog fasadnih radova. Utrošeno 18,4 od 29 miliona evra.">
         <div class="overlay-photo" aria-hidden="true">
           <img src="assets/hero.webp" width="2048" height="1152" alt="">
+          <span class="hero-scan" aria-hidden="true"></span>
           <div class="marker c-risk is-risk"><span class="dot"></span><span class="tag">Fasada, istok: <b class="mono">rizik</b></span></div>
         </div>
         <div class="panel" aria-hidden="true">
@@ -433,13 +470,13 @@
             <span class="panel-stamp mono">Dron snimak 06:40</span>
           </div>
           <div class="kpi-main">
-            <span class="kpi-value mono">64%</span>
+            <span class="kpi-value mono" data-count="64" data-suffix="%" data-start="700" data-dur="1300">64%</span>
             <span class="kpi-label">izvedeno<br><span class="mono">plan 68%</span></span>
           </div>
           <div class="bar"><i style="--w:64%"></i><span class="plan" style="--p:68%"></span></div>
           <div class="risk">
             <div class="risk-label"><svg class="ic"><use href="#i-warning"/></svg>Rizik kašnjenja</div>
-            <div class="risk-value mono">11 dana</div>
+            <div class="risk-value mono" data-count="11" data-suffix=" dana" data-start="1900" data-dur="700">11 dana</div>
             <p>Fasada, istok: isporuka panela kasni 9 dana.</p>
           </div>
           <div class="budget"><span>Budžet</span><span class="mono">€18,4M od 29,0M</span></div>
@@ -456,14 +493,14 @@
 
   <section class="section" id="prednosti" aria-labelledby="prednosti-naslov">
     <div class="wrap">
-      <h2 class="section-title" id="prednosti-naslov">Jasan pregled. Pravovremene odluke.</h2>
+      <h2 class="section-title" id="prednosti-naslov" data-reveal>Jasan pregled. Pravovremene odluke.</h2>
 
       <div class="bento">
-        <article class="tile tile-risk">
+        <article class="tile tile-risk" data-reveal>
           <span class="tile-icon" aria-hidden="true"><svg class="ic"><use href="#i-warning"/></svg></span>
           <h3>Rizici pre kašnjenja</h3>
           <p>Odstupanja od roka i budžeta vidite na vreme, vezana za zonu, izvođača i stavku budžeta.</p>
-          <div class="forecast" role="img" aria-label="Primer prognoze za fasadne radove: plan završetka 14. mart 2027, prognoza 25. mart 2027, kašnjenje 11 dana">
+          <div class="forecast" data-forecast role="img" aria-label="Primer prognoze za fasadne radove: plan završetka 14. mart 2027, prognoza 25. mart 2027, kašnjenje 11 dana">
             <div class="fc-rows" aria-hidden="true">
               <div><span>Plan završetka</span><span class="mono">14.3.2027.</span></div>
               <div><span>Prognoza</span><span class="mono late">25.3.2027.</span></div>
@@ -481,21 +518,21 @@
           </div>
         </article>
 
-        <article class="tile tile-progress">
+        <article class="tile tile-progress" data-reveal>
           <img src="assets/drone.webp" width="1536" height="1024" alt="" loading="lazy">
           <span class="tile-icon" aria-hidden="true"><svg class="ic"><use href="#i-scan"/></svg></span>
           <h3>Napredak po zonama</h3>
           <p>AI poredi foto i dron snimke sa planom i pokazuje stvarni procenat izvedenih radova po zoni.</p>
         </article>
 
-        <article class="tile">
+        <article class="tile" data-reveal>
           <span class="tile-icon" aria-hidden="true"><svg class="ic"><use href="#i-file-text"/></svg></span>
           <h3>Automatski izveštaji</h3>
           <p>Izveštaji za upravu i investitore pripremaju se iz podataka i fotografija sa terena.</p>
         </article>
       </div>
 
-      <div class="team">
+      <div class="team" data-reveal>
         <svg class="ic" aria-hidden="true"><use href="#i-users-three"/></svg>
         <p><strong>Jedan izvor istine.</strong> Projektni menadžeri, podizvođači i naručioci rade sa istim podacima, na jednom mestu.</p>
       </div>
@@ -504,11 +541,11 @@
 
   <section class="section how" id="kako" aria-labelledby="kako-naslov">
     <div class="wrap">
-      <h2 class="section-title" id="kako-naslov">Od snimka sa terena do odluke uprave.</h2>
-      <p class="section-lead">SiteSync AI koristi snimke koje vaš tim već pravi i pretvara ih u podatke za odluke.</p>
+      <h2 class="section-title" id="kako-naslov" data-reveal>Od snimka sa terena do odluke uprave.</h2>
+      <p class="section-lead" data-reveal>SiteSync AI koristi snimke koje vaš tim već pravi i pretvara ih u podatke za odluke.</p>
 
       <div class="how-grid survey-wrap is-analyzed" id="analiza">
-        <figure class="survey is-analyzed">
+        <figure class="survey is-analyzed" data-reveal>
           <div class="survey-bar">
             <div class="segmented" role="group" aria-label="Prikaz dron snimka">
               <button type="button" data-view="raw" aria-pressed="false"><svg class="ic" aria-hidden="true"><use href="#i-camera"/></svg>Snimak</button>
@@ -527,7 +564,7 @@
         </figure>
 
         <div class="how-aside">
-          <div class="results" aria-live="polite">
+          <div class="results" aria-live="polite" data-reveal>
             <div class="raw">
               <h3>Originalni snimak iz drona</h3>
               <p>Uključite AI analizu da vidite prepoznate zone i odstupanja od terminskog plana.</p>
@@ -543,9 +580,9 @@
           </div>
 
           <ol class="steps">
-            <li><span class="step-icon" aria-hidden="true"><svg class="ic"><use href="#i-drone"/></svg></span><div><h3>Snimanje terena</h3><p>Dron ili telefon. Snimci se automatski šalju na platformu.</p></div></li>
-            <li><span class="step-icon" aria-hidden="true"><svg class="ic"><use href="#i-scan"/></svg></span><div><h3>Poređenje sa planom</h3><p>AI prepoznaje zone i računa napredak u odnosu na terminski plan.</p></div></li>
-            <li><span class="step-icon" aria-hidden="true"><svg class="ic"><use href="#i-bell-ringing"/></svg></span><div><h3>Upozorenja i izveštaji</h3><p>Odstupanja stižu odgovornima, a izveštaj za upravu je spreman.</p></div></li>
+            <li data-reveal><span class="step-icon" aria-hidden="true"><svg class="ic"><use href="#i-drone"/></svg></span><div><h3>Snimanje terena</h3><p>Dron ili telefon. Snimci se automatski šalju na platformu.</p></div></li>
+            <li data-reveal><span class="step-icon" aria-hidden="true"><svg class="ic"><use href="#i-scan"/></svg></span><div><h3>Poređenje sa planom</h3><p>AI prepoznaje zone i računa napredak u odnosu na terminski plan.</p></div></li>
+            <li data-reveal><span class="step-icon" aria-hidden="true"><svg class="ic"><use href="#i-bell-ringing"/></svg></span><div><h3>Upozorenja i izveštaji</h3><p>Odstupanja stižu odgovornima, a izveštaj za upravu je spreman.</p></div></li>
           </ol>
         </div>
       </div>
@@ -553,9 +590,10 @@
   </section>
 
   <section class="section demo" id="demo" aria-labelledby="demo-naslov">
+    <div class="demo-media" aria-hidden="true"><img src="assets/rebar.webp" width="2048" height="1152" alt="" loading="lazy"></div>
     <div class="wrap">
       <div>
-        <h2 class="section-title" id="demo-naslov">Pogledajte SiteSync AI na projektu poput vašeg.</h2>
+        <h2 class="section-title" id="demo-naslov" data-reveal>Pogledajte SiteSync AI na projektu poput vašeg.</h2>
         <p class="section-lead">Demo pripremamo za vrstu i veličinu vaših projekata, ne kao opštu prezentaciju.</p>
         <ul class="demo-list">
           <li><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg>Platforma na primeru projekta slične vrste i veličine</li>
@@ -564,7 +602,7 @@
         </ul>
       </div>
 
-      <div class="form-card" id="demo-kartica">
+      <div class="form-card" id="demo-kartica" data-reveal>
         <form id="demo-forma" novalidate>
           <h3>Podaci za demo</h3>
           <p class="sub">Polja označena zvezdicom su obavezna.</p>
@@ -599,7 +637,7 @@
             </div>
             <p class="error" id="portfolio-greska">Izaberite jednu od ponuđenih vrednosti.</p>
           </div>
-          <button class="btn btn-primary" type="submit">Zakažite demo <svg class="ic" aria-hidden="true"><use href="#i-arrow-right"/></svg></button>
+          <button class="btn btn-primary" type="submit">Zakažite demo <span class="btn-ic" aria-hidden="true"><svg class="ic"><use href="#i-arrow-right"/></svg></span></button>
           <p class="form-note">Demo stranica: podaci iz forme se ne šalju i ne čuvaju.</p>
         </form>
         <div class="success" role="status" aria-live="polite">
@@ -620,6 +658,44 @@
 </footer>
 
 <script>
+  var REDUCE = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var T0 = performance.now();
+
+  /* Hero intro: photo settles, scan line sweeps, panel counts up, risk appears last */
+  (function () {
+    if (REDUCE) return;
+    var hero = document.querySelector('.hero');
+    hero.classList.add('is-intro');
+    Array.prototype.forEach.call(document.querySelectorAll('[data-count]'), function (el) {
+      var target = parseFloat(el.dataset.count), suffix = el.dataset.suffix || '';
+      var start = parseFloat(el.dataset.start), dur = parseFloat(el.dataset.dur);
+      el.textContent = '0' + suffix;
+      function frame(now) {
+        var t = Math.min(1, Math.max(0, (now - T0 - start) / dur));
+        var eased = 1 - Math.pow(1 - t, 3);
+        el.textContent = Math.round(target * eased) + suffix;
+        if (t < 1) requestAnimationFrame(frame);
+      }
+      requestAnimationFrame(frame);
+    });
+  })();
+
+  /* Scroll reveals and forecast build, one-shot via IntersectionObserver */
+  (function () {
+    if (REDUCE || !('IntersectionObserver' in window)) return;
+    document.documentElement.classList.add('reveals-armed');
+    var forecast = document.querySelector('[data-forecast]');
+    forecast.classList.add('is-armed');
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        e.target.classList.add('in-view');
+        io.unobserve(e.target);
+      });
+    }, { threshold: 0.2, rootMargin: '0px 0px -8% 0px' });
+    Array.prototype.forEach.call(document.querySelectorAll('[data-reveal], [data-forecast]'), function (el) { io.observe(el); });
+  })();
+
   /* Hero markers: anchor to photo coordinates, hide any marker that would collide with copy or panel */
   (function () {
     var hero = document.querySelector('.hero');
@@ -646,6 +722,11 @@
           if (br.width === 0) return true;
           return !overlaps(r, { left: br.left - 12, right: br.right + 12, top: br.top - 12, bottom: br.bottom + 12 });
         });
+        if (clear && !m.classList.contains('is-placed')) {
+          /* pop in roughly when the scan line passes the marker */
+          var due = 350 + 1500 * ((r.left - heroRect.left) / W);
+          m.style.setProperty('--md', Math.max(0, due - (performance.now() - T0)) / 1000 + 's');
+        }
         m.classList.toggle('is-placed', clear);
       });
     }
@@ -674,13 +755,12 @@
       b.addEventListener('click', function () { touched = true; setView(b.dataset.view); });
     });
 
-    var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (!reduce && 'IntersectionObserver' in window) {
+    if (!REDUCE && 'IntersectionObserver' in window) {
       setView('raw');
       var io = new IntersectionObserver(function (entries) {
         if (!entries[0].isIntersecting) return;
         io.disconnect();
-        setTimeout(function () { if (!touched) setView('ai'); }, 700);
+        setTimeout(function () { if (!touched) setView('ai'); }, 1000);
       }, { threshold: 0.55 });
       io.observe(survey.querySelector('.survey-media'));
     }
