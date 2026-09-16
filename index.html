@@ -10,7 +10,7 @@
 <meta property="og:url" content="https://umilutinovic25-hash.github.io/sitesync-ai/">
 <meta property="og:title" content="SiteSync AI: kašnjenje vidite pre nego što nastane">
 <meta property="og:description" content="Enterprise AI platforma za građevinske i EPC kompanije.">
-<meta property="og:image" content="https://umilutinovic25-hash.github.io/sitesync-ai/assets/og.jpg">
+<meta property="og:image" content="https://umilutinovic25-hash.github.io/sitesync-ai/assets/og.jpg?v=2">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="675">
 <meta name="twitter:card" content="summary_large_image">
@@ -166,7 +166,7 @@
   .panel-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 18px; }
   .panel-label { margin: 0; font-size: 12px; color: var(--text-3); }
   .panel-title { margin: 2px 0 0; font-size: 16px; font-weight: 600; }
-  .panel-stamp { font-size: 11px; color: var(--text-3); white-space: nowrap; padding-top: 2px; }
+  .panel-stamp { font-size: 12px; color: var(--text-3); white-space: nowrap; padding-top: 2px; }
   .kpi-main { display: flex; align-items: flex-end; gap: 14px; }
   .kpi-value { font-size: 56px; line-height: .9; font-weight: 500; letter-spacing: -.03em; color: var(--text); }
   .kpi-label { font-size: 14px; line-height: 1.35; color: var(--text-2); padding-bottom: 4px; }
@@ -217,7 +217,7 @@
   .timeline .span { position: absolute; top: 17px; height: 5px; border-radius: var(--r-sm); background: rgba(232, 163, 61, .45); }
   .fc-note { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--text-3); }
   .forecast.is-armed .timeline .span { transform: scaleX(0); transform-origin: left; transition: transform .9s var(--ease) .3s; }
-  .forecast.is-armed .timeline .tick.late, .forecast.is-armed .fc-rows .late, .forecast.is-armed .chip { opacity: 0; transition: opacity .5s var(--ease) 1.1s; }
+  .forecast.is-armed .timeline .tick.late, .forecast.is-armed .fc-rows .late, .forecast.is-armed .chip { opacity: .25; transition: opacity .5s var(--ease) 1.1s; }
   .forecast.is-armed .chip { transform: translateY(6px); transition: opacity .5s var(--ease) 1.25s, transform .5s var(--ease) 1.25s; }
   .forecast.is-armed.in-view .timeline .span { transform: none; }
   .forecast.is-armed.in-view .timeline .tick.late, .forecast.is-armed.in-view .fc-rows .late, .forecast.is-armed.in-view .chip { opacity: 1; transform: none; }
@@ -251,7 +251,8 @@
   .segmented button:active { transform: scale(.98); }
   .segmented button[aria-pressed="true"] { background: var(--text); color: var(--bg); }
   .segmented .ic { font-size: 18px; }
-  .survey-stamp { font-size: 13px; color: var(--text-3); }
+  .survey-stamp { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; font-size: 13px; line-height: 1.3; color: var(--text-3); }
+  .survey-stamp span:first-child { color: var(--text-2); font-weight: 500; }
   .survey-media { position: relative; border-radius: var(--r-lg); overflow: hidden; background: var(--bg); border: 1px solid var(--line); box-shadow: var(--bezel), var(--shadow); }
   .survey-media img { width: 100%; height: auto; aspect-ratio: 3 / 2; object-fit: cover; transition: filter .5s var(--ease); }
   .survey.is-analyzed .survey-media img { filter: saturate(.7) brightness(.8); }
@@ -331,8 +332,9 @@
   footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 24px; padding-top: 22px; padding-bottom: 22px; }
 
   /* ---------- Scroll reveals (armed by JS only) ---------- */
-  .reveals-armed [data-reveal] { opacity: 0; transform: translateY(24px); filter: blur(4px); transition: opacity .8s var(--ease), transform .8s var(--ease), filter .8s var(--ease); transition-delay: var(--rd, 0s); }
-  .reveals-armed [data-reveal].in-view { opacity: 1; transform: none; filter: none; }
+  /* Content is dimmed, never hidden, so full-page captures and non-scrolling previews still show everything */
+  .reveals-armed [data-reveal] { opacity: .4; transform: translateY(16px); transition: opacity .6s var(--ease), transform .6s var(--ease); transition-delay: var(--rd, 0s); }
+  .reveals-armed [data-reveal].in-view { opacity: 1; transform: none; }
   .bento > :nth-child(2) { --rd: .1s; } .bento > :nth-child(3) { --rd: .2s; }
   .steps > :nth-child(2) { --rd: .1s; } .steps > :nth-child(3) { --rd: .2s; }
   .reveals-armed .survey .survey-media img { transform: scale(1.04); transition: transform 1s var(--ease), filter .5s var(--ease); }
@@ -342,6 +344,11 @@
   .reveal { animation: rise .7s var(--ease) both; }
   .d1 { animation-delay: .08s; } .d2 { animation-delay: .16s; } .d3 { animation-delay: .24s; } .d4 { animation-delay: .4s; }
   @keyframes rise { from { opacity: 0; transform: translateY(14px); } }
+
+  @media print {
+    body::after, .hero-scan, .hero-markers { display: none; }
+    [data-reveal], .forecast *, .risk, .zone { opacity: 1 !important; transform: none !important; }
+  }
 
   @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
@@ -392,6 +399,7 @@
     .tile { padding: 24px 20px; }
     .fc-rows .mono { font-size: 20px; }
     .how-aside { grid-template-columns: 1fr; }
+    .survey-stamp { align-items: flex-start; }
     .zone span { font-size: 10px; padding: 4px 6px; }
     .z3 span { top: 4px; right: 4px; }
     .plan-txt { display: none; }
@@ -440,7 +448,7 @@
     </div>
     <div class="hero-markers" aria-hidden="true">
       <div class="marker c-ok" data-x=".42" data-y=".80"><span class="dot"></span><span class="tag">Konstrukcija, 2. sprat: <b class="mono">u planu</b></span></div>
-      <div class="marker c-warn" data-x=".60" data-y=".91"><span class="dot"></span><span class="tag">Instalacije, zona B: <b class="mono">kasni 4 dana</b></span></div>
+      <div class="marker c-warn" data-x=".60" data-y=".91"><span class="dot"></span><span class="tag">Instalacije, lamela 2: <b class="mono">kasni 4 dana</b></span></div>
       <div class="marker c-risk is-risk" data-x=".84" data-y=".84"><span class="dot"></span><span class="tag">Fasada, istok: <b class="mono">rizik</b></span></div>
     </div>
 
@@ -551,10 +559,10 @@
               <button type="button" data-view="raw" aria-pressed="false"><svg class="ic" aria-hidden="true"><use href="#i-camera"/></svg>Snimak</button>
               <button type="button" data-view="ai" aria-pressed="true"><svg class="ic" aria-hidden="true"><use href="#i-scan"/></svg>AI analiza</button>
             </div>
-            <span class="survey-stamp mono">Dron snimak 14.9. u 06:40</span>
+            <span class="survey-stamp"><span>Primer: temelji, faza 1</span><span class="mono">Dron snimak 14.9. u 06:40</span></span>
           </div>
           <div class="survey-media">
-            <img src="assets/drone.webp" width="1536" height="1024" loading="lazy" alt="Snimak gradilišta iz drona odozgo. U režimu AI analize označene su četiri zone sa procentom izvedenih radova.">
+            <img src="assets/drone.webp" width="1536" height="1024" loading="lazy" alt="Primer projekta u fazi temelja: snimak gradilišta iz drona odozgo. U režimu AI analize označene su četiri zone sa procentom izvedenih radova.">
             <span class="scan" aria-hidden="true"></span>
             <div class="zone z1 c-ok" aria-hidden="true"><span>Zona A 100%</span></div>
             <div class="zone z2 c-warn" aria-hidden="true"><span>Zona B 71%</span></div>
