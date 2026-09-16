@@ -26,7 +26,9 @@
     Dials: variance 5, motion 4, density 4. One dark theme for the whole page.
     Shape system: containers 14px, controls and chips 8px, data annotations 4px.
     Icons: Phosphor (regular), inlined as an SVG sprite.
-    Surfaces: double-bezel trays on the product panel, drone survey and form; fixed film grain.
+    Surfaces: double-bezel trays on the product panel, drone survey, form and floating nav; fixed film grain.
+    3D: Three.js digital twin in the benefits bento, lazy-loaded when near the viewport, drone photo as fallback.
+    Z-index scale: header 20, floating nav 40, grain 90, skip link 100.
     Motion: hero analysis intro (scan, staggered markers, count-up), scroll reveals, forecast build. All off under reduced motion.
   */
   :root {
@@ -111,6 +113,16 @@
   .nav-link { color: var(--text-2); font-size: 15px; text-decoration: none; padding: 10px 14px; border-radius: var(--r-md); transition: color .2s var(--ease); }
   .nav-link:hover { color: var(--text); }
   .nav .btn { margin-left: 10px; }
+
+  /* ---------- Floating nav (shown after the hero, hidden near the form) ---------- */
+  .float-nav { position: fixed; top: 14px; left: 0; right: 0; z-index: 40; display: flex; justify-content: center; padding: 0 16px; pointer-events: none; opacity: 0; transform: translateY(-14px); transition: opacity .35s var(--ease), transform .35s var(--ease); }
+  .float-nav.is-visible { opacity: 1; transform: none; }
+  .float-nav.is-visible .float-inner { pointer-events: auto; }
+  .float-inner { display: flex; align-items: center; justify-content: space-between; gap: 28px; width: min(760px, 100%); padding: 6px 6px 6px 14px; border-radius: 12px; background: rgba(11, 18, 32, .84); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border: 1px solid var(--line-strong); box-shadow: var(--bezel), 0 16px 40px rgba(2, 6, 16, .5); }
+  .float-inner .brand { font-size: 16px; }
+  .float-inner .brand svg { width: 24px; height: 24px; }
+  .float-inner nav { display: flex; align-items: center; gap: 2px; }
+  .float-inner .btn { margin-left: 8px; }
 
   /* ---------- Hero ---------- */
   .hero {
@@ -202,7 +214,7 @@
   .tile-icon { display: inline-grid; place-items: center; width: 44px; height: 44px; border-radius: var(--r-md); background: rgba(232, 163, 61, .12); color: var(--accent); margin-bottom: 20px; }
   .tile-icon .ic { font-size: 24px; }
 
-  .tile-risk { grid-row: span 2; display: flex; flex-direction: column; background: radial-gradient(120% 90% at 100% 0%, rgba(232, 163, 61, .14) 0%, rgba(232, 163, 61, 0) 55%), var(--surface-2); }
+  .tile-risk { display: flex; flex-direction: column; background: radial-gradient(120% 90% at 100% 0%, rgba(232, 163, 61, .14) 0%, rgba(232, 163, 61, 0) 55%), var(--surface-2); }
   .forecast { margin-top: auto; padding-top: 36px; }
   .fc-rows { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
   .fc-rows div { border-top: 1px solid var(--line); padding-top: 12px; }
@@ -223,12 +235,22 @@
   .forecast.is-armed.in-view .timeline .tick.late, .forecast.is-armed.in-view .fc-rows .late, .forecast.is-armed.in-view .chip { opacity: 1; transform: none; }
   .chip { display: inline-flex; align-items: center; flex: none; white-space: nowrap; padding: 4px 8px; border-radius: var(--r-sm); background: rgba(232, 163, 61, .14); color: var(--accent); font: 500 13px/1 "IBM Plex Mono", monospace; }
 
-  .tile-progress { min-height: 280px; display: flex; flex-direction: column; justify-content: flex-end; background: var(--surface-1); }
-  .tile-progress > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 62% 45%; }
-  .tile-progress::after { content: ""; position: absolute; inset: 0; background: linear-gradient(0deg, rgba(7, 13, 24, .96) 12%, rgba(7, 13, 24, .55) 60%, rgba(7, 13, 24, .2) 100%); }
-  .tile-progress > * { position: relative; z-index: 1; }
-  .tile-progress > img { z-index: 0; transition: transform 1s var(--ease); }
-  .tile-progress:hover > img { transform: scale(1.04); }
+
+  .tile-twin { grid-row: span 2; display: flex; flex-direction: column; padding-bottom: 22px; background: radial-gradient(90% 60% at 50% 100%, rgba(63, 207, 142, .07), rgba(63, 207, 142, 0) 60%), var(--surface-2); }
+  .twin-stage { position: relative; flex: 1; min-height: 380px; margin: 18px -12px 0; border-radius: var(--r-md); overflow: hidden; }
+  .twin-stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; transition: opacity .8s var(--ease); cursor: grab; touch-action: pan-y; }
+  .twin-stage canvas:active { cursor: grabbing; }
+  .twin-fallback { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: .5; transition: opacity .6s var(--ease); }
+  .twin-ready canvas { opacity: 1; }
+  .twin-ready .twin-fallback { opacity: 0; }
+  .twin-label { position: absolute; left: 12px; bottom: 12px; display: flex; align-items: center; gap: 8px; max-width: calc(100% - 24px); font: 500 13px/1.2 "IBM Plex Mono", monospace; color: var(--text); background: rgba(7, 13, 24, .9); border: 1px solid var(--line); padding: 8px 10px; border-radius: var(--r-sm); }
+  .twin-hint { position: absolute; right: 12px; bottom: 20px; font-size: 12px; color: var(--text-3); opacity: 0; transition: opacity .6s var(--ease); }
+  .twin-ready .twin-hint { opacity: 1; }
+  .sw { flex: none; width: 10px; height: 10px; border-radius: 2px; background: var(--c); }
+  .twin-legend { list-style: none; margin: 14px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px 18px; font-size: 13px; color: var(--text-2); }
+  .twin-legend li { display: flex; align-items: center; gap: 7px; }
+  .c-done { --c: #5B6B84; }
+  .c-plan .sw { background: transparent; border: 1px solid var(--text-3); }
 
   .team { margin-top: 32px; padding-top: 28px; border-top: 1px solid var(--line); display: flex; gap: 16px; align-items: flex-start; }
   .team .ic { font-size: 28px; color: var(--text-3); margin-top: 1px; }
@@ -369,7 +391,7 @@
     .overlay-photo .marker { left: 14px; top: auto; bottom: 18px; z-index: 1; }
     .panel { position: relative; top: auto; right: auto; width: auto; }
     .bento { grid-template-columns: 1fr; }
-    .tile-risk { grid-row: auto; }
+    .tile-twin { grid-row: auto; }
     .how-grid { grid-template-columns: 1fr; gap: 28px; }
     .how-aside { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; align-items: start; }
     .steps { margin-top: 0; }
@@ -397,6 +419,9 @@
     .risk-value { font-size: 32px; }
     .section { padding: 72px 0 80px; }
     .tile { padding: 24px 20px; }
+    .twin-stage { min-height: 320px; margin: 16px -8px 0; }
+    .twin-label { font-size: 12px; white-space: nowrap; }
+    .twin-hint { display: none; }
     .fc-rows .mono { font-size: 20px; }
     .how-aside { grid-template-columns: 1fr; }
     .survey-stamp { align-items: flex-start; }
@@ -439,6 +464,20 @@
     </nav>
   </div>
 </header>
+
+<div class="float-nav" id="float-nav" inert>
+  <div class="float-inner">
+    <a class="brand" href="#" aria-label="SiteSync AI, početak stranice">
+      <svg width="24" height="24" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="6" fill="#111B2E" stroke="rgba(203,213,225,.25)"/><path d="M8 22 L16 8 L24 22 Z" fill="none" stroke="#E8A33D" stroke-width="2.5" stroke-linejoin="round"/><circle cx="16" cy="18" r="2.2" fill="#E8A33D"/></svg>
+      <span>SiteSync <b>AI</b></span>
+    </a>
+    <nav aria-label="Brza navigacija">
+      <a class="nav-link" href="#prednosti">Prednosti</a>
+      <a class="nav-link" href="#kako">Kako funkcioniše</a>
+      <a class="btn btn-primary btn-sm" href="#demo">Zakažite demo</a>
+    </nav>
+  </div>
+</div>
 
 <main id="glavno">
   <section class="hero" aria-labelledby="hero-naslov">
@@ -504,6 +543,25 @@
       <h2 class="section-title" id="prednosti-naslov" data-reveal>Jasan pregled. Pravovremene odluke.</h2>
 
       <div class="bento">
+        <article class="tile tile-twin" data-reveal>
+          <span class="tile-icon" aria-hidden="true"><svg class="ic"><use href="#i-scan"/></svg></span>
+          <h3>Napredak po spratovima i zonama</h3>
+          <p>AI poredi foto i dron snimke sa planom i pokazuje stvarni procenat izvedenih radova na 3D modelu objekta.</p>
+          <div class="twin-stage" id="twin" role="img" aria-label="3D model objekta sa osam etaža: prizemlje i spratovi 1 do 3 završeni, sprat 4 na 82 posto u planu, sprat 5 na 40 posto kasni 4 dana, istočna fasada u riziku, spratovi 6 i 7 planirani.">
+            <img class="twin-fallback" src="assets/drone.webp" width="1536" height="1024" alt="" loading="lazy">
+            <canvas aria-hidden="true"></canvas>
+            <span class="twin-hint" aria-hidden="true"></span>
+            <span class="twin-label c-warn" aria-hidden="true"><span class="sw"></span><span class="twin-text">Sprat 5: 40% izvedeno, kasni 4 dana</span></span>
+          </div>
+          <ul class="twin-legend" aria-hidden="true">
+            <li class="c-done"><span class="sw"></span>Završeno</li>
+            <li class="c-ok"><span class="sw"></span>U planu</li>
+            <li class="c-warn"><span class="sw"></span>Kasni</li>
+            <li class="c-risk"><span class="sw"></span>Rizik</li>
+            <li class="c-plan"><span class="sw"></span>Planirano</li>
+          </ul>
+        </article>
+
         <article class="tile tile-risk" data-reveal>
           <span class="tile-icon" aria-hidden="true"><svg class="ic"><use href="#i-warning"/></svg></span>
           <h3>Rizici pre kašnjenja</h3>
@@ -524,13 +582,6 @@
             </div>
             <p class="fc-note" aria-hidden="true"><span class="chip">+11 dana</span>Primer prognoze za fasadne radove</p>
           </div>
-        </article>
-
-        <article class="tile tile-progress" data-reveal>
-          <img src="assets/drone.webp" width="1536" height="1024" alt="" loading="lazy">
-          <span class="tile-icon" aria-hidden="true"><svg class="ic"><use href="#i-scan"/></svg></span>
-          <h3>Napredak po zonama</h3>
-          <p>AI poredi foto i dron snimke sa planom i pokazuje stvarni procenat izvedenih radova po zoni.</p>
         </article>
 
         <article class="tile" data-reveal>
@@ -704,6 +755,20 @@
     Array.prototype.forEach.call(document.querySelectorAll('[data-reveal], [data-forecast]'), function (el) { io.observe(el); });
   })();
 
+  /* Floating nav: visible once the hero has scrolled away, hidden again while the demo form is on screen */
+  (function () {
+    if (!('IntersectionObserver' in window)) return;
+    var nav = document.getElementById('float-nav');
+    var heroOn = true, demoOn = false;
+    function update() {
+      var show = !heroOn && !demoOn;
+      nav.classList.toggle('is-visible', show);
+      if (show) nav.removeAttribute('inert'); else nav.setAttribute('inert', '');
+    }
+    new IntersectionObserver(function (e) { heroOn = e[0].isIntersecting; update(); }).observe(document.querySelector('.hero'));
+    new IntersectionObserver(function (e) { demoOn = e[0].isIntersecting; update(); }, { threshold: 0.3 }).observe(document.getElementById('demo'));
+  })();
+
   /* Hero markers: anchor to photo coordinates, hide any marker that would collide with copy or panel */
   (function () {
     var hero = document.querySelector('.hero');
@@ -807,6 +872,196 @@
       card.classList.add('sent');
     });
   })();
+</script>
+
+<script type="importmap">
+  { "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.min.js", "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/" } }
+</script>
+<script type="module">
+  /* Digital twin: lazy-loads Three.js near the viewport, renders only while visible, falls back to the drone photo */
+  const stage = document.getElementById('twin');
+  const REDUCE = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const COARSE = matchMedia('(pointer: coarse)').matches;
+  let visible = false, started = false;
+
+  new IntersectionObserver((entries) => {
+    visible = entries[0].isIntersecting;
+    if (visible && !started) { started = true; init().catch(() => stage.classList.add('twin-failed')); }
+  }, { rootMargin: '300px 0px' }).observe(stage);
+
+  async function init() {
+    const probe = document.createElement('canvas');
+    if (!(probe.getContext('webgl2') || probe.getContext('webgl'))) throw new Error('WebGL unavailable');
+    const THREE = await import('three');
+    const { OrbitControls } = await import('three/addons/controls/OrbitControls.js');
+
+    const canvas = stage.querySelector('canvas');
+    const label = stage.querySelector('.twin-label');
+    const labelText = stage.querySelector('.twin-text');
+    stage.querySelector('.twin-hint').textContent = COARSE ? 'Dodirnite sprat za detalje' : 'Prevucite da okrenete model';
+
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 200);
+    camera.position.set(19.5, 12.5, 19.5);
+
+    const controls = new OrbitControls(camera, canvas);
+    controls.target.set(0, 4.5, 0);
+    controls.enableZoom = false;
+    controls.enablePan = false;
+    controls.enableDamping = true;
+    controls.minPolarAngle = 0.95;
+    controls.maxPolarAngle = 1.4;
+    controls.autoRotate = !REDUCE;
+    controls.autoRotateSpeed = 0.8;
+    if (COARSE) controls.enabled = false; /* keep vertical page scroll on touch; tap selects instead */
+    controls.update();
+
+    scene.add(new THREE.HemisphereLight(0xdbe4f0, 0x0b1220, 1.2));
+    const sun = new THREE.DirectionalLight(0xffffff, 1.5);
+    sun.position.set(9, 16, 7);
+    scene.add(sun);
+
+    const COLORS = { done: 0x5b6b84, ok: 0x3fcf8e, warn: 0xe8a33d, risk: 0xf2766b, plan: 0x94a3b8 };
+    const W = 7, D = 4.6, H = 1, SLAB = 0.14;
+    const floors = [
+      { status: 'done', progress: 1, text: 'Prizemlje: 100% izvedeno' },
+      { status: 'done', progress: 1, text: 'Sprat 1: 100% izvedeno' },
+      { status: 'done', progress: 1, text: 'Sprat 2: 100% izvedeno' },
+      { status: 'done', progress: 1, text: 'Sprat 3: 100% izvedeno' },
+      { status: 'ok', progress: 0.82, text: 'Sprat 4: 82% izvedeno, u planu' },
+      { status: 'warn', progress: 0.4, text: 'Sprat 5: 40% izvedeno, kasni 4 dana' },
+      { status: 'plan', progress: 0, text: 'Sprat 6: planirano' },
+      { status: 'plan', progress: 0, text: 'Sprat 7: planirano' }
+    ];
+
+    const building = new THREE.Group();
+    scene.add(building);
+    const pickables = [];
+    const lines = (geometry, color, opacity) => new THREE.LineSegments(new THREE.EdgesGeometry(geometry), new THREE.LineBasicMaterial({ color, transparent: true, opacity }));
+    const solid = (color, opacity, glow) => new THREE.MeshStandardMaterial({ color, roughness: 0.85, metalness: 0.05, transparent: opacity < 1, opacity, emissive: color, emissiveIntensity: glow });
+
+    /* foundation plate and site grid */
+    const plate = new THREE.Mesh(new THREE.BoxGeometry(W + 0.6, 0.2, D + 0.6), solid(0x243248, 1, 0));
+    plate.position.y = -0.1;
+    building.add(plate);
+    const grid = new THREE.GridHelper(26, 26, 0x22314a, 0x172238);
+    grid.position.y = -0.21;
+    scene.add(grid);
+
+    const colX = [-W / 2 + 0.3, -W / 6, W / 6, W / 2 - 0.3];
+    const colZ = [-D / 2 + 0.3, 0, D / 2 - 0.3];
+
+    floors.forEach((floor, i) => {
+      const y0 = i * H;
+      const color = COLORS[floor.status];
+      if (floor.status === 'plan') {
+        const ghost = lines(new THREE.BoxGeometry(W, H, D), COLORS.plan, 0.22);
+        ghost.position.y = y0 + H / 2;
+        building.add(ghost);
+      } else {
+        const builtWidth = W * floor.progress;
+        colX.forEach((x) => {
+          if (x > -W / 2 + builtWidth + 0.01) return;
+          colZ.forEach((z) => {
+            const column = new THREE.Mesh(new THREE.BoxGeometry(0.2, H - SLAB, 0.2), solid(floor.status === 'done' ? 0x6b7a92 : color, 1, floor.status === 'done' ? 0 : 0.15));
+            column.position.set(x, y0 + (H - SLAB) / 2, z);
+            building.add(column);
+          });
+        });
+        const slabGeometry = new THREE.BoxGeometry(builtWidth, SLAB, D);
+        const slab = new THREE.Mesh(slabGeometry, solid(color, 0.95, floor.status === 'done' ? 0.02 : 0.22));
+        slab.position.set(-W / 2 + builtWidth / 2, y0 + H - SLAB / 2, 0);
+        building.add(slab);
+        const edge = lines(slabGeometry, 0xe8edf4, floor.status === 'done' ? 0.18 : 0.45);
+        edge.position.copy(slab.position);
+        building.add(edge);
+        if (floor.progress < 1) {
+          const rest = lines(new THREE.BoxGeometry(W - builtWidth, H, D), color, 0.35);
+          rest.position.set(-W / 2 + builtWidth + (W - builtWidth) / 2, y0 + H / 2, 0);
+          building.add(rest);
+        }
+      }
+      const hit = new THREE.Mesh(new THREE.BoxGeometry(W, H, D), new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false }));
+      hit.position.y = y0 + H / 2;
+      hit.userData = { text: floor.text, status: floor.status, box: [W, H, D], center: hit.position.clone() };
+      building.add(hit);
+      pickables.push(hit);
+    });
+
+    /* east facade at risk, floors 1 to 4 */
+    const facadeGeometry = new THREE.PlaneGeometry(D, 4 * H);
+    const facade = new THREE.Mesh(facadeGeometry, new THREE.MeshBasicMaterial({ color: COLORS.risk, transparent: true, opacity: 0.2, side: THREE.DoubleSide, depthWrite: false }));
+    facade.rotation.y = Math.PI / 2;
+    facade.position.set(W / 2 + 0.03, 3, 0);
+    building.add(facade);
+    const facadeEdge = lines(facadeGeometry, COLORS.risk, 0.9);
+    facadeEdge.rotation.copy(facade.rotation);
+    facadeEdge.position.copy(facade.position);
+    building.add(facadeEdge);
+    facade.userData = { text: 'Fasada, istok: rizik kašnjenja 11 dana', status: 'risk', box: [0.3, 4 * H + 0.2, D + 0.3], center: facade.position.clone() };
+    pickables.unshift(facade);
+
+    /* tower crane for scale */
+    const craneMat = solid(0xe8a33d, 1, 0.1);
+    const mast = new THREE.Mesh(new THREE.BoxGeometry(0.16, 9.6, 0.16), craneMat);
+    mast.position.set(-W / 2 - 1.3, 4.8, -D / 2 - 0.9);
+    const jib = new THREE.Mesh(new THREE.BoxGeometry(7.5, 0.14, 0.14), craneMat);
+    jib.position.set(-W / 2 + 1.6, 9.5, -D / 2 - 0.9);
+    building.add(mast, jib);
+
+    /* selection outline */
+    const outline = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(1, 1, 1)), new THREE.LineBasicMaterial({ color: 0xe8edf4, transparent: true, opacity: 0.9 }));
+    building.add(outline);
+
+    const defaultPick = pickables.find((p) => p.userData.status === 'warn');
+    function select(target) {
+      const d = target.userData;
+      outline.scale.set(d.box[0] + 0.25, d.box[1] + 0.02, d.box[2] + 0.25);
+      outline.position.copy(d.center);
+      labelText.textContent = d.text;
+      label.className = 'twin-label c-' + d.status;
+    }
+    select(defaultPick);
+
+    const raycaster = new THREE.Raycaster();
+    const pointer = new THREE.Vector2();
+    function pick(event) {
+      const rect = canvas.getBoundingClientRect();
+      pointer.set(((event.clientX - rect.left) / rect.width) * 2 - 1, -((event.clientY - rect.top) / rect.height) * 2 + 1);
+      raycaster.setFromCamera(pointer, camera);
+      const hit = raycaster.intersectObjects(pickables, false)[0];
+      return hit ? hit.object : null;
+    }
+    if (COARSE) {
+      canvas.addEventListener('click', (e) => { const t = pick(e); if (t) select(t); });
+    } else {
+      canvas.addEventListener('pointermove', (e) => { const t = pick(e); select(t || defaultPick); });
+      canvas.addEventListener('pointerleave', () => select(defaultPick));
+    }
+
+    function resize() {
+      const { clientWidth: w, clientHeight: h } = stage;
+      renderer.setSize(w, h, false);
+      camera.aspect = w / h;
+      const narrow = camera.aspect < 1.4; /* narrow tiles on phones: bring the model closer, lift it above the label */
+      camera.zoom = narrow ? 1.22 : 1;
+      controls.target.y = narrow ? 3.7 : 4.5;
+      controls.update();
+      camera.updateProjectionMatrix();
+    }
+    new ResizeObserver(resize).observe(stage);
+    resize();
+
+    renderer.setAnimationLoop(() => {
+      if (!visible) return;
+      controls.update();
+      renderer.render(scene, camera);
+    });
+    renderer.render(scene, camera);
+    stage.classList.add('twin-ready');
+  }
 </script>
 </body>
 </html>
